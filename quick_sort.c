@@ -7,22 +7,15 @@ void troca(int *a, int *b) {
 }
 
 int separa(int *v, int esq, int dir) {
-    int i = esq, j = dir - 1, pivo = v[dir];
+    int i, j;
+    i = j = esq;
+    int pivo = v[dir];
 
-    while (1) {
-        while (i < dir && v[i] <= pivo) {
+    for (; j < dir; j++) {
+        if (v[j] <= pivo) {
+            troca(&v[i], &v[j]);
             i++;
         }
-
-        while (j > i && v[j] > pivo) {
-            j--;
-        }
-
-        if (i >= j) {
-            break;
-        }
-
-        troca(&v[i], &v[j]);
     }
 
     troca(&v[i], &v[dir]);
