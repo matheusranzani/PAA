@@ -1,46 +1,36 @@
 #include <stdio.h>
 
-// Função que realiza a ordenação em ordem decrescente do vetor
-void merge(float *vetor, int esquerda, int meio, int direita) {
-    int i = esquerda;
-    int j = meio + 1;
-    int k = 0;
+// Função que troca os elementos do vetor
+void troca(float *a, float *b) {
+    float auxiliar = *a;
+    *a = *b;
+    *b = auxiliar;
+}
 
-    int tamanho_auxiliar = (direita - esquerda) + 1;
-    float vetor_auxiliar[tamanho_auxiliar];
+// Função que separa o vetor em duas partes ordenadas em relação a um pivô e retorna a posição desse pivô
+int separa(float *vetor, int esquerda, int direita) {
+    int i, j;
+    i = j = esquerda;
+    float pivo = vetor[direita]; // Pivô é o último elemento do vetor
 
-    while (i <= meio && j <= direita) {
-        if (vetor[i] >= vetor[j]) {
-            vetor_auxiliar[k++] = vetor[i++];
-        } else {
-            vetor_auxiliar[k++] = vetor[j++];
+    for (; j < direita; j++) {
+        if (vetor[j] >= pivo) {
+            troca(&vetor[i++], &vetor[j]);
         }
     }
 
-    while (i <= meio) {
-        vetor_auxiliar[k++] = vetor[i++];
-    }
+    troca(&vetor[i], &vetor[direita]);
 
-    while (j <= direita) {
-        vetor_auxiliar[k++] = vetor[j++];
-    }
-
-    for (i = 0; i < tamanho_auxiliar; i++) {
-        vetor[esquerda + i] = vetor_auxiliar[i];
-    }
+    return i;
 }
 
-// Função recursiva Merge Sort para ordenção de complexidade O(nlog)
-void merge_sort(float *vetor, int esquerda, int direita) {
-    if (esquerda >= direita) {
-        return;
+// Função recursiva Quick Sort para ordenção de complexidade O(nlog)
+void quick_sort(float *vetor, int esquerda, int direita) {
+    if (esquerda < direita) {
+        int i = separa(vetor, esquerda, direita);
+        quick_sort(vetor, esquerda, i - 1);
+        quick_sort(vetor, i + 1, direita);
     }
-
-    int meio = (esquerda + direita) / 2;
-
-    merge_sort(vetor, esquerda, meio);
-    merge_sort(vetor, meio + 1, direita);
-    merge(vetor, esquerda, meio, direita);
 }
 
 int main() {
@@ -58,7 +48,8 @@ int main() {
             scanf("%f", &vetor[j]);
         }
 
-        merge_sort(vetor, 0, C - 1);
+        // Ordena o vetor em ordem decrescente
+        quick_sort(vetor, 0, C - 1);
 
         // Como o vetor é iniciado em 0, a K-ésima maior nota será na realidade a posição anterior (K- 1)
         printf("%.2f\n", vetor[K - 1]);
