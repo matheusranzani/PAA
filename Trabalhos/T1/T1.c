@@ -1,3 +1,9 @@
+/**
+ * Nome: Matheus Goulart Ranzani
+ * RA: 800278
+ * Curso: Ciência da Computação
+*/
+
 #include <stdio.h>
 
 // Função que troca os elementos do vetor
@@ -35,8 +41,7 @@ void quick_sort(float *vetor, int esquerda, int direita) {
 
 int main() {
     int N;
-    int K;
-    int C;
+    int K, C;
 
     scanf("%d", &N);
 
