@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 typedef struct noh Noh;
 struct noh {
@@ -60,7 +61,7 @@ void imprime_grafo(Grafo *G, FILE *saida) {
     fprintf(saida, "%d %d\n", G->V, G->A);
     for (int i = 0; i < G->V; i++) {
         for (p = G->lista[i]; p != NULL; p = p->proximo) {
-            fprintf(saida, "%2d ", p->rotulo);
+            fprintf(saida, "%3d ", p->rotulo);
         }
         fprintf(saida, "-1\n");
     }
@@ -68,20 +69,68 @@ void imprime_grafo(Grafo *G, FILE *saida) {
     fprintf(saida, "\n");
 
     for (int i = 0; i < G->V; i++) {
-        Noh* current = G->lista[i];
+        Noh* p = G->lista[i];
         fprintf(saida, "Lista de adjacência do vértice %d\n", i);
-        while (current != NULL) {
-            fprintf(saida, "-> Vértice %d (peso: %.2f)", current->rotulo, current->distancia);
-            current = current->proximo;
+        while (p != NULL) {
+            fprintf(saida, "-> Vértice %d (peso: %.2f)", p->rotulo, p->distancia);
+            p = p->proximo;
         }
         fprintf(saida, "\n");
     }
 }
 
-void dijkstra(Grafo *G, int origem, int *distancias, int *predecessor, int eh_impostor) {
-    if (eh_impostor) {
+int distancia_minima(float *distancias, int *visitados, int N) {
+    float minima = FLT_MAX;
+    int indice_minima = 0;
 
+    for (int i = 0; i < N; i++) {
+        if (!visitados[i] && distancias[i] <= minima) {
+            minima = distancias[i];
+            indice_minima = i;
+        }
     }
+
+    return indice_minima;
+}
+
+void printa_distancias(float *distancias, int N) {
+    printf("Vértice\tDistância da origem\n");
+    for (int i = 0; i < N; i++) {
+        printf("%d\t%.1f\n", i, distancias[i]);
+    }
+}
+
+void dijkstra(Grafo *G, int origem) {
+    int N = G->V;
+    float distancias[N];
+    int visitados[N];
+
+    for (int i = 0; i < N; i++) {
+        distancias[i] = FLT_MAX;
+        visitados[i] = 0;
+    }
+
+    distancias[origem] = 0;
+
+    for (int i = 0; i < N - 1; i++) {
+        int v = distancia_minima(distancias, visitados, N);
+        visitados[v] = 1;
+
+        Noh *p = G->lista[v];
+
+        while (p != NULL) {
+            int w = p->rotulo;
+
+            if (!visitados[w] && distancias[v] != FLT_MAX && (distancias[v] + p->distancia) < distancias[w]) {
+                distancias[w] = distancias[v] + p->distancia;
+            }
+
+            p = p->proximo;
+        }
+    }
+
+    printa_distancias(distancias, N);
+    // printf("%.1f\n", distancias[0]);
 }
 
 int main() {
@@ -121,7 +170,7 @@ int main() {
 
         scanf("%d", &consulta);
 
-        // dijkstra();
+        dijkstra(grafo_salas, consulta);
     }
 
     imprime_grafo(grafo_salas, arquivo1);
