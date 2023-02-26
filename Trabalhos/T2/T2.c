@@ -94,23 +94,32 @@ int distancia_minima(float *distancias, int *visitados, int N) {
 }
 
 void printa_distancias(float *distancias, int N) {
-    printf("Vértice\tDistância da origem\n");
+    printf("Vértice\t\tDistância da origem\n");
     for (int i = 0; i < N; i++) {
-        printf("%d\t%.1f\n", i, distancias[i]);
+        printf("%d\t\t%.1f\n", i, distancias[i]);
     }
 }
 
-void dijkstra(Grafo *G, int origem) {
+void printa_predecessores(int *predecessores, int N) {
+    for (int i = 0; i < N; i++) {
+        printf("%d ", predecessores[i]);
+    }
+    printf("\n");
+}
+
+void dijkstra(Grafo *G, int origem, int *tubulacoes, int M) {
     int N = G->V;
     float distancias[N];
     int visitados[N];
+    int predecessores[N];
 
     for (int i = 0; i < N; i++) {
         distancias[i] = FLT_MAX;
         visitados[i] = 0;
+        predecessores[i] = -1;
     }
 
-    distancias[origem] = 0;
+    distancias[origem] = .0;
 
     for (int i = 0; i < N - 1; i++) {
         int v = distancia_minima(distancias, visitados, N);
@@ -123,14 +132,69 @@ void dijkstra(Grafo *G, int origem) {
 
             if (!visitados[w] && distancias[v] != FLT_MAX && (distancias[v] + p->distancia) < distancias[w]) {
                 distancias[w] = distancias[v] + p->distancia;
+                predecessores[w] = v;
             }
 
             p = p->proximo;
         }
     }
 
-    printa_distancias(distancias, N);
-    // printf("%.1f\n", distancias[0]);
+    int *caminho = (int *)malloc(sizeof(int));
+    int i = 0;
+    int auxiliar = -1;
+
+    while (predecessores[auxiliar] != -1) {
+        auxiliar = predecessores[auxiliar];
+
+        if (i == 0) {
+            auxiliar = 0;
+        }
+
+        if (predecessores[auxiliar] != -1) {
+            caminho = (int *)realloc(caminho, sizeof(int) * (i + 1));
+            caminho[i++] = predecessores[auxiliar];
+        }
+    }
+
+    // printa_distancias(distancias, N);
+    // printa_predecessores(predecessores, N);
+
+    int tamanho_caminho = i;
+    // printa_predecessores(caminho, tamanho_caminho);
+
+    float distancia_impostor = FLT_MAX;
+
+    for (int i = tamanho_caminho - 1; i >= 0; i--) {
+        for (int j = 0; j < M; j++) {
+            if (caminho[i] == tubulacoes[j]) {
+                // printf("c=%d t=%d i=%d j=%d\n", caminho[i], tubulacoes[j], i, j);
+                if (j % 2 == 0) {
+                    int eh_caminho = 0;
+                    for (int k = 0; k < tamanho_caminho; k++) {
+                        if (caminho[k] != 0 && caminho[k] == tubulacoes[j + 1]) eh_caminho = 1;
+                    }
+                    if (eh_caminho && abs(distancias[tubulacoes[j]] - distancias[tubulacoes[j + 1]]) >= 1 && distancia_impostor > distancias[0] - distancias[tubulacoes[j + 1]] + 1) {
+                        distancia_impostor = distancias[0] - distancias[tubulacoes[j + 1]] + 1;
+                        // printf("\nc=%.1f d=%.1f\n", distancias[tubulacoes[j + 1]], distancia_impostor);
+                    }
+                } else {
+                    int eh_caminho = 0;
+                    for (int k = 0; k < tamanho_caminho; k++) {
+                        if (caminho[k] != 0 && caminho[k] == tubulacoes[j - 1]) eh_caminho = 1;
+                    }
+                    if (eh_caminho && abs(distancias[tubulacoes[j]] - distancias[tubulacoes[j - 1]]) >= 1 && distancia_impostor > distancias[0] - distancias[tubulacoes[j - 1]] + 1) {
+                        distancia_impostor = distancias[0] - distancias[tubulacoes[j - 1]] + 1;
+                        // printf("\nc=%.1f d=%.1f\n", distancias[tubulacoes[j - 1]], distancia_impostor);
+                    }
+                }
+            }
+        }
+    }
+
+    if (distancia_impostor == FLT_MAX) distancia_impostor = distancias[0];
+
+    // printf("%.1f %.1f\n", distancia_impostor, distancias[0]);
+    distancia_impostor >= distancias[0] ? printf("victory\n") : printf("defeat\n");
 }
 
 int main() {
@@ -147,8 +211,9 @@ int main() {
 
     scanf("%d %d %d %d", &M, &E, &N, &C);
 
-    Grafo *grafo_salas = inicializa(M + 1);
-    Grafo *grafo_tubulacoes = inicializa(N);
+    Grafo *grafo_salas = inicializa(M);
+    int *tubulacoes = (int *)calloc(N * 2, sizeof(int));
+    // Grafo *grafo_tubulacoes = inicializa(N);
 
     for (int i = 0; i < E; i++) {
         int U, V;
@@ -158,23 +223,35 @@ int main() {
         insere_aresta(grafo_salas, U, V, D);
     }
 
+    int j = 0;
     for (int i = 0; i < N; i++) {
         int U, V;
 
         scanf("%d %d", &U, &V);
-        insere_aresta(grafo_tubulacoes, U, V, 0);
+
+        tubulacoes[j++] = U;
+        tubulacoes[j++] = V;
+
+        // insere_aresta(grafo_tubulacoes, U, V, 0);
     }
+
+    for (int i = 0; i < 2 * N; i++) {
+        // printf("%d ", tubulacoes[i]);
+    }
+
+    // printf("\n");
 
     for (int i = 0; i < C; i++) {
         int consulta;
 
         scanf("%d", &consulta);
 
-        dijkstra(grafo_salas, consulta);
+        dijkstra(grafo_salas, consulta, tubulacoes, 2 * N);
+        // printf("--------------------------------------------------------\n");
     }
 
     imprime_grafo(grafo_salas, arquivo1);
-    imprime_grafo(grafo_tubulacoes, arquivo2);
+    // imprime_grafo(tubulacoes, arquivo2);
 
     fclose(arquivo1);
     fclose(arquivo2);
