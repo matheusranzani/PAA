@@ -141,7 +141,7 @@ void dijkstra(Grafo *G, int origem, int *tubulacoes, int M) {
 
     int *caminho = (int *)malloc(sizeof(int));
     int i = 0;
-    int auxiliar = -1;
+    int auxiliar = 0;
 
     while (predecessores[auxiliar] != -1) {
         auxiliar = predecessores[auxiliar];
@@ -173,7 +173,9 @@ void dijkstra(Grafo *G, int origem, int *tubulacoes, int M) {
                     for (int k = 0; k < tamanho_caminho; k++) {
                         if (caminho[k] != 0 && caminho[k] == tubulacoes[j + 1]) eh_caminho = 1;
                     }
-                    if (eh_caminho && abs(distancias[tubulacoes[j]] - distancias[tubulacoes[j + 1]]) >= 1 && distancia_impostor > distancias[0] - distancias[tubulacoes[j + 1]] + 1) {
+                    if (eh_caminho &&
+                        abs(distancias[tubulacoes[j]] - distancias[tubulacoes[j + 1]]) >= 1 &&
+                        distancia_impostor > distancias[0] - distancias[tubulacoes[j + 1]] + 1) {
                         distancia_impostor = distancias[0] - distancias[tubulacoes[j + 1]] + 1;
                         // printf("\nc=%.1f d=%.1f\n", distancias[tubulacoes[j + 1]], distancia_impostor);
                     }
@@ -182,7 +184,9 @@ void dijkstra(Grafo *G, int origem, int *tubulacoes, int M) {
                     for (int k = 0; k < tamanho_caminho; k++) {
                         if (caminho[k] != 0 && caminho[k] == tubulacoes[j - 1]) eh_caminho = 1;
                     }
-                    if (eh_caminho && abs(distancias[tubulacoes[j]] - distancias[tubulacoes[j - 1]]) >= 1 && distancia_impostor > distancias[0] - distancias[tubulacoes[j - 1]] + 1) {
+                    if (eh_caminho &&
+                        abs(distancias[tubulacoes[j]] - distancias[tubulacoes[j - 1]]) >= 1 &&
+                        distancia_impostor > distancias[0] - distancias[tubulacoes[j - 1]] + 1) {
                         distancia_impostor = distancias[0] - distancias[tubulacoes[j - 1]] + 1;
                         // printf("\nc=%.1f d=%.1f\n", distancias[tubulacoes[j - 1]], distancia_impostor);
                     }
