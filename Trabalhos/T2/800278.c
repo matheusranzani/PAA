@@ -16,7 +16,7 @@ struct grafo {
     int A; // Número de Arestas
 };
 
-Grafo inicializaGrafo(int V) {
+Grafo inicializa_grafo(int V) {
     int i, j;
 
     Grafo G = malloc(sizeof * G);
@@ -38,10 +38,10 @@ Grafo inicializaGrafo(int V) {
 }
 
 void insere_aresta(Grafo G, int v, int w, float distancia) {
-        G->M[v][w] = distancia;
-        G->M[w][v] = distancia;
+    G->M[v][w] = distancia;
+    G->M[w][v] = distancia;
 
-        G->A++;
+    G->A++;
 }
 
 void insere_tubulacao(Grafo G, int v, int w) {
@@ -97,8 +97,8 @@ int main() {
 
     scanf("%d %d %d %d", &M, &E, &N, &C);
 
-    Grafo grafo_salas = inicializaGrafo(M);
-    Grafo grafo_salas_impostor = inicializaGrafo(M);
+    Grafo grafo_salas = inicializa_grafo(M);
+    Grafo grafo_salas_impostor = inicializa_grafo(M);
 
     for (int i = 0; i < E; i++) {
         int U, V;
